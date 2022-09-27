@@ -16,9 +16,17 @@ def find_borders(points: List[Point]):
         if point.y() > top_point.y():
             top_point = point
             top_ind = i
+        elif point.y() == top_point.y():
+            if point.x() > top_point.x():
+                top_point = point
+                top_ind = i
         if point.y() < bot_point.y():
             bot_point = point
             bot_ind = i
+        elif point.y() == bot_point.y():
+            if point.x() < top_point.x():
+                bot_point = point
+                bot_ind = i
     return (top_point, top_ind), (bot_point, bot_ind)
 
 
@@ -48,6 +56,11 @@ def draw_plot(points: List[Point], pairs: List[Tuple[Point, Point]]):
     plt.show()
 
 
+def check_pairs(pairs: List) -> bool:
+    return (pairs[-1][0] == pairs[0][0] and pairs[-1][1] == pairs[0][1]) or (
+            pairs[-1][0] == pairs[0][1] and pairs[-1][1] == pairs[0][0])
+
+
 def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
     top, bot = find_borders(points)
     top_point, top_ind, bot_point, bot_ind = top[0], top[1], bot[0], bot[1]
@@ -57,11 +70,19 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
     while True:
         top_angle = get_angle(tmp_top_point, top_point, points[top_ind - 1])
         bot_angle = get_angle(tmp_bot_point, bot_point, points[bot_ind - 1])
-
         if abs(top_angle - bot_angle) < __eps:
-            pairs.append((bot_point, points[top_ind - 1]))
-            pairs.append((points[bot_ind - 1], points[top_ind - 1]))
-            pairs.append((points[bot_ind - 1], top_point))
+            if bot_point != points[top_ind - 1]:
+                pairs.append((bot_point, points[top_ind - 1]))
+                if check_pairs(pairs):
+                    return pairs
+            if points[bot_ind - 1] != points[top_ind - 1]:
+                pairs.append((points[bot_ind - 1], points[top_ind - 1]))
+                if check_pairs(pairs):
+                    return pairs
+            if points[bot_ind - 1] != top_point:
+                pairs.append((points[bot_ind - 1], top_point))
+                if check_pairs(pairs):
+                    return pairs
             top_point = points[top_ind - 1]
             bot_point = points[bot_ind - 1]
             top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(180), top_point, points[top_ind])
@@ -69,23 +90,22 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
             top_ind = top_ind - 1
             bot_ind = bot_ind - 1
             continue
-        if top_angle > bot_angle:
-            tmp_pair = (points[bot_ind - 1], top_point)
-            pairs.append(tmp_pair)
+        elif top_angle > bot_angle:
+            if points[bot_ind - 1] != top_point:
+                pairs.append((points[bot_ind - 1], top_point))
             top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(bot_angle), top_point, tmp_top_point)
             bot_point = points[bot_ind - 1]
             bot_point, tmp_bot_point = rotate_line(bot_point, np.deg2rad(180), bot_point, points[bot_ind])
             bot_ind = bot_ind - 1
         elif top_angle < bot_angle:
-            tmp_pair = (points[top_ind - 1], bot_point)
-            pairs.append(tmp_pair)
+            if bot_point != points[top_ind - 1]:
+                pairs.append((bot_point, points[top_ind - 1]))
             bot_point, tmp_bot_point = rotate_line(bot_point, np.deg2rad(top_angle), bot_point, tmp_bot_point)
             top_point = points[top_ind - 1]
             top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(180), top_point, points[top_ind])
             top_ind = top_ind - 1
 
-        if (pairs[-1][0] == pairs[0][0] and pairs[-1][1] == pairs[0][1]) or (
-                pairs[-1][0] == pairs[0][1] and pairs[-1][1] == pairs[0][0]):
+        if check_pairs(pairs):
             return pairs
 
 
