@@ -5,9 +5,12 @@ from python.file_manager import read_points
 
 def run(filename: str):
     points = read_points(filename)
-    width = get_width(points)
+    width, line = get_width(points)
     with open('output.txt', 'w') as f:
-        f.write(str(width))
+        for pair in line:
+            for vertex in pair:
+                f.write(str(vertex))
+            f.write('\n')
 
 
 if __name__ == '__main__':

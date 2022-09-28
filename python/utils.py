@@ -13,7 +13,7 @@ class Point:
         return self.__y
 
     def __str__(self):
-        return '(' + str(self.__x) + ', ' + str(self.__y) + ')'
+        return str(self.__x) + ',' + str(self.__y) + ';'
 
     def __eq__(self, other):
         return self.__x == other.__x and self.__y == other.__y

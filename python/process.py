@@ -65,24 +65,29 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
     top, bot = find_borders(points)
     top_point, top_ind, bot_point, bot_ind = top[0], top[1], bot[0], bot[1]
     pairs = [(top_point, bot_point)]
+    lines = []
     tmp_top_point = Point(top_point.x() + 1, top_point.y())
     tmp_bot_point = Point(bot_point.x() - 1, bot_point.y())
+    lines.append(((top_point, tmp_top_point), (bot_point, tmp_bot_point)))
     while True:
         top_angle = get_angle(tmp_top_point, top_point, points[top_ind - 1])
         bot_angle = get_angle(tmp_bot_point, bot_point, points[bot_ind - 1])
         if abs(top_angle - bot_angle) < __eps:
             if bot_point != points[top_ind - 1]:
                 pairs.append((bot_point, points[top_ind - 1]))
+                lines.append(((top_point, points[top_ind - 1]), (bot_point, points[bot_ind - 1])))
                 if check_pairs(pairs):
-                    return pairs
+                    return pairs, lines
             if points[bot_ind - 1] != points[top_ind - 1]:
                 pairs.append((points[bot_ind - 1], points[top_ind - 1]))
+                lines.append(((top_point, points[top_ind - 1]), (bot_point, points[bot_ind - 1])))
                 if check_pairs(pairs):
-                    return pairs
+                    return pairs, lines
             if points[bot_ind - 1] != top_point:
                 pairs.append((points[bot_ind - 1], top_point))
+                lines.append(((top_point, points[top_ind - 1]), (bot_point, points[bot_ind - 1])))
                 if check_pairs(pairs):
-                    return pairs
+                    return pairs, lines
             top_point = points[top_ind - 1]
             bot_point = points[bot_ind - 1]
             top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(180), top_point, points[top_ind])
@@ -93,20 +98,22 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
         elif top_angle > bot_angle:
             if points[bot_ind - 1] != top_point:
                 pairs.append((points[bot_ind - 1], top_point))
-            top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(bot_angle), top_point, tmp_top_point)
-            bot_point = points[bot_ind - 1]
-            bot_point, tmp_bot_point = rotate_line(bot_point, np.deg2rad(180), bot_point, points[bot_ind])
-            bot_ind = bot_ind - 1
+                top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(bot_angle), top_point, tmp_top_point)
+                bot_point = points[bot_ind - 1]
+                bot_point, tmp_bot_point = rotate_line(bot_point, np.deg2rad(180), bot_point, points[bot_ind])
+                bot_ind = bot_ind - 1
+                lines.append(((top_point, tmp_top_point), (bot_point, tmp_bot_point)))
         elif top_angle < bot_angle:
             if bot_point != points[top_ind - 1]:
                 pairs.append((bot_point, points[top_ind - 1]))
-            bot_point, tmp_bot_point = rotate_line(bot_point, np.deg2rad(top_angle), bot_point, tmp_bot_point)
-            top_point = points[top_ind - 1]
-            top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(180), top_point, points[top_ind])
-            top_ind = top_ind - 1
+                bot_point, tmp_bot_point = rotate_line(bot_point, np.deg2rad(top_angle), bot_point, tmp_bot_point)
+                top_point = points[top_ind - 1]
+                top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(180), top_point, points[top_ind])
+                top_ind = top_ind - 1
+                lines.append(((top_point, tmp_top_point), (bot_point, tmp_bot_point)))
 
         if check_pairs(pairs):
-            return pairs
+            return pairs, lines
 
 
 def distance(pair: Tuple[Point]) -> float:
@@ -115,10 +122,12 @@ def distance(pair: Tuple[Point]) -> float:
 
 
 def get_width(points: List[Point]) -> float:
-    pairs = get_pairs(points)
+    pairs, lines = get_pairs(points)
     width = sys.float_info.max
-    for pair in pairs:
+    result_line = 0
+    for pair, line in zip(pairs, lines):
         if distance(pair) < width:
             width = distance(pair)
+            result_line = line
     # draw_plot(points, pairs)
-    return width
+    return width, result_line
