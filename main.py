@@ -1,6 +1,7 @@
 import sys
 from python.process import get_width
 from python.file_manager import read_points
+from python.utils import Point
 
 
 def run(filename: str):
@@ -9,7 +10,10 @@ def run(filename: str):
     with open('output.txt', 'w') as f:
         for pair in line:
             for vertex in pair:
-                f.write(str(vertex))
+                rounded_vertex = Point(
+                    float(round(vertex.x()) if abs(round(vertex.x()) - vertex.x()) < 10e-9 else vertex.x()),
+                    float(round(vertex.y()) if abs(round(vertex.y()) - vertex.y()) < 10e-9 else vertex.y()))
+                f.write(str(rounded_vertex))
             f.write('\n')
 
 

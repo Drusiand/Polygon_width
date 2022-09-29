@@ -101,6 +101,8 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
                 top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(bot_angle), top_point, tmp_top_point)
                 bot_point = points[bot_ind - 1]
                 bot_point, tmp_bot_point = rotate_line(bot_point, np.deg2rad(180), bot_point, points[bot_ind])
+                delta_point = Point(tmp_bot_point.x() - bot_point.x(), tmp_bot_point.y() - bot_point.y())
+                tmp_top_point = Point(top_point.x() - delta_point.x(), top_point.y() - delta_point.y())
                 bot_ind = bot_ind - 1
                 lines.append(((top_point, tmp_top_point), (bot_point, tmp_bot_point)))
         elif top_angle < bot_angle:
@@ -109,6 +111,8 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
                 bot_point, tmp_bot_point = rotate_line(bot_point, np.deg2rad(top_angle), bot_point, tmp_bot_point)
                 top_point = points[top_ind - 1]
                 top_point, tmp_top_point = rotate_line(top_point, np.deg2rad(180), top_point, points[top_ind])
+                delta_point = Point(tmp_top_point.x() - top_point.x(), tmp_top_point.y() - top_point.y())
+                tmp_bot_point = Point(bot_point.x() - delta_point.x(), bot_point.y() - delta_point.y())
                 top_ind = top_ind - 1
                 lines.append(((top_point, tmp_top_point), (bot_point, tmp_bot_point)))
 
