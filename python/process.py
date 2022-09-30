@@ -147,18 +147,29 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
             return pairs, lines
 
 
+def line_distance(lines):
+    line_1, line_2 = lines[0], lines[1]
+    p1_1, p1_2 = line_1[0], line_1[1]
+    p2_1, p2_2 = line_2[0], line_2[1]
+    length_1 = sqrt((p1_2.x() - p1_1.x()) ** 2 + (p1_2.y() - p1_1.y()) ** 2)
+    length_2 = sqrt((p2_2.x() - p2_1.x()) ** 2 + (p2_2.y() - p2_1.y()) ** 2)
+    rho_1 = (p1_1.x() * p1_2.y() - p1_2.x() * p1_1.y()) / length_1
+    rho_2 = -1 * ((p2_1.x() * p2_2.y() - p2_2.x() * p2_1.y()) / length_2)
+    return abs(rho_1 - rho_2)
+
+
 def distance(pair: Tuple[Point]) -> float:
     p1, p2 = pair[0], pair[1]
     return sqrt((p2.x() - p1.x()) ** 2 + (p2.y() - p1.y()) ** 2)
 
 
-def get_width(points: List[Point]) -> float:
+def get_width(points: List[Point]):
     pairs, lines = get_pairs(points)
     width = sys.float_info.max
     result_line = 0
     for pair, line in zip(pairs, lines):
-        if distance(pair) < width:
-            width = distance(pair)
+        if line_distance(line) < width:
+            width = line_distance(line)
             result_line = line
-    # draw_plot(points, pairs)
+    # draw_plot(points, result_line[0], result_line[1])
     return width, result_line
