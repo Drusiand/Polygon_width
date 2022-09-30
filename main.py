@@ -6,13 +6,14 @@ from python.utils import Point
 
 def run(filename: str):
     points = read_points(filename)
+    # points = [Point(a, a*a) for a in range(20000)]
     width, line = get_width(points)
     with open('output.txt', 'w') as f:
         for pair in line:
             for vertex in pair:
                 rounded_vertex = Point(
-                    float(round(vertex.x()) if abs(round(vertex.x()) - vertex.x()) < 10e-9 else vertex.x()),
-                    float(round(vertex.y()) if abs(round(vertex.y()) - vertex.y()) < 10e-9 else vertex.y()))
+                    float(round(vertex.x()) if abs(round(vertex.x(), 7) - vertex.x()) < 10e-7 else vertex.x()),
+                    float(round(vertex.y()) if abs(round(vertex.y(), 7) - vertex.y()) < 10e-7 else vertex.y()))
                 f.write(str(rounded_vertex))
             f.write('\n')
 
