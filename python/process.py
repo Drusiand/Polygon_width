@@ -2,6 +2,7 @@ import sys
 from math import degrees, atan2, sqrt
 from typing import List, Tuple
 import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
 import numpy as np
 from numpy import cos, sin
 from python.utils import Point
@@ -43,7 +44,7 @@ def rotate_line(c: Point, angle: float, p1: Point, p2: Point):
 
 def get_angle(a: Point, b: Point, c: Point):
     ang = degrees(atan2(c.y() - b.y(), c.x() - b.x()) - atan2(a.y() - b.y(), a.x() - b.x()))
-    return abs(ang) - 180 if abs(ang) >= 180 else abs(ang)
+    return 360 - abs(ang) if abs(ang) >= 180 else abs(ang)
 
 
 def draw_plot(points: List[Point], pairs: List[Tuple[Point, Point]]):
@@ -54,6 +55,26 @@ def draw_plot(points: List[Point], pairs: List[Tuple[Point, Point]]):
     plt.plot(xs, ys, c='black')
     for pair in pairs:
         plt.plot([pair[0].x(), pair[1].x()], [pair[0].y(), pair[1].y()])
+    plt.show()
+
+
+def draw_plot(polygon: List[Point], top_line: Tuple[Point, Point], bot_line: Tuple[Point, Point]):
+    fig, ax = plt.subplots()
+
+    # The "clip_on" here specifies that we _don't_ want to clip the line
+    # to the extent of the axes
+    ax.axline([top_line[0].x(), top_line[0].y()], [top_line[1].x(), top_line[1].y()], lw=1, c='red')
+    ax.axline([bot_line[0].x(), bot_line[0].y()], [bot_line[1].x(), bot_line[1].y()], lw=1, c='red')
+    patch_polygon = [(p.x(), p.y()) for p in polygon]
+    poly = Polygon(patch_polygon)
+    ax.add_patch(poly)
+    ax.scatter(top_line[0].x(), top_line[0].y(), c='green')
+    ax.scatter(top_line[1].x(), top_line[1].y(), c='black')
+    ax.scatter(bot_line[0].x(), bot_line[0].y(), c='green')
+    ax.scatter(bot_line[1].x(), bot_line[1].y(), c='black')
+    manager = plt.get_current_fig_manager()
+    # manager.window.showMaximized()
+    plt.tight_layout()
     plt.show()
 
 
@@ -71,6 +92,10 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
     tmp_bot_point = Point(bot_point.x() - 1, bot_point.y())
     lines.append(((top_point, tmp_top_point), (bot_point, tmp_bot_point)))
     while True:
+        # for point in pairs[-1]:
+        #     print(point, end=' ')
+        # print()
+        draw_plot(points, lines[-1][0], lines[-1][1])
         top_angle = get_angle(tmp_top_point, top_point, points[top_ind - 1])
         bot_angle = get_angle(tmp_bot_point, bot_point, points[bot_ind - 1])
         # if abs(top_angle - bot_angle) < __eps:
