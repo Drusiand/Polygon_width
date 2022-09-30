@@ -95,7 +95,7 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
         # for point in pairs[-1]:
         #     print(point, end=' ')
         # print()
-        draw_plot(points, lines[-1][0], lines[-1][1])
+        # draw_plot(points, lines[-1][0], lines[-1][1])
         top_angle = get_angle(tmp_top_point, top_point, points[top_ind - 1])
         bot_angle = get_angle(tmp_bot_point, bot_point, points[bot_ind - 1])
         # if abs(top_angle - bot_angle) < __eps:
