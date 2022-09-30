@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy import cos, sin
 from python.utils import Point
+import math
 
-__eps = 10e-9
+__eps = 10e-11
 
 
 def find_borders(points: List[Point]):
@@ -72,7 +73,8 @@ def get_pairs(points: List[Point]) -> List[Tuple[Point]]:
     while True:
         top_angle = get_angle(tmp_top_point, top_point, points[top_ind - 1])
         bot_angle = get_angle(tmp_bot_point, bot_point, points[bot_ind - 1])
-        if abs(top_angle - bot_angle) < __eps:
+        # if abs(top_angle - bot_angle) < __eps:
+        if math.isclose(top_angle, bot_angle, rel_tol=10e-20):
             if bot_point != points[top_ind - 1]:
                 pairs.append((bot_point, points[top_ind - 1]))
                 lines.append(((top_point, points[top_ind - 1]), (bot_point, points[bot_ind - 1])))
